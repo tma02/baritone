@@ -1,0 +1,19 @@
+{
+  "name": "spotify-menubar",
+  "version": "1.0.0",
+  "description": "A Spotify controller that lives in the menubar.",
+  "main": "index.js",
+  "dependencies": {
+    "font-awesome": "^4.6.1",
+    "kbm-robot": "0.0.4",
+    "menubar": "^4.1.0"
+  },
+  "devDependencies": {
+    "electron-prebuilt": "^0.37.8"
+  },
+  "scripts": {
+    "test": "electron ."
+  },
+  "author": "Tianyi Ma <tn.ma@outlook.com>",
+  "license": "GPL-2.0"
+}

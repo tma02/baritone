@@ -1,0 +1,153 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
+    <style>
+      @font-face {
+        font-family: 'Montserrat';
+        font-style: normal;
+        font-weight: 200;
+        src: local('Montserrat-Regular'), url(Montserrat.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+      }
+      body {
+        font-family: 'Montserrat', sans-serif;
+        background: #373737;
+        padding: 0;
+        margin: 0;
+      }
+      #control-bar {
+        padding-top: 16px;
+        color: #fff;
+        width: 100vw;
+        text-align: center;
+      }
+      #control-bar i {
+        font-size: 30px;
+        cursor: pointer;
+      }
+      #shuffle-btn {
+        position: absolute;
+        left: 60px;
+        margin-top: 8px;
+        font-size: 16px !important;
+      }
+      #prev-btn {
+        position: absolute;
+        left: 130px;
+        margin-top: 3px;
+        font-size: 24px !important;
+      }
+      #next-btn {
+        position: absolute;
+        right: 130px;
+        margin-top: 3px;
+        font-size: 24px !important;
+      }
+      #cover {
+        position: absolute;
+        top: 64px;
+        width: 100vw;
+        height: 100vw;
+      }
+      #position {
+        background-color: #23CF5F;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0vw;
+        height: 4px;
+        box-shadow: 0 0 20px rgba(35, 207, 95, .85);
+        border-radius: 2px;
+      }
+      #seek {
+        position: absolute;
+        top: 64px;
+        left: 0;
+        width: 100vw;
+        height: 100vw;
+      }
+      #seek-pos {
+        background-color: #373737;
+        color: #fff;
+        position: absolute;
+        padding: 2px;
+        padding-left: 8px;
+        padding-right: 8px;
+        border-radius: 2px;
+        width: auto;
+        height: auto;
+        top: 100vh;
+        left: 100vw;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="control-bar">
+      <i id="shuffle-btn" class="fa fa-random" aria-hidden="true" onclick="shuffle()"></i>
+      <i id="prev-btn" class="fa fa-step-backward" aria-hidden="true" onclick="prev()"></i>
+      <i id="play-btn" class="fa fa-play" aria-hidden="true" onclick="play()"></i>
+      <i id="next-btn" class="fa fa-step-forward" aria-hidden="true" onclick="next()"></i>
+    </div>
+    <img id="cover">
+    <div id="position"></div>
+    <div id="seek" onclick="seek(event)" onmousemove="getPos(event)" onmouseout="stopTracking()">
+      <div id="seek-pos">1:00</div>
+    </div>
+  </body>
+  <script>
+    var ipc = require('ipc');
+    var shuffling = false;
+    var length = 0;
+    ipc.on('coverUrl', function(url) {
+      document.getElementById('cover').src = url;
+    });
+    ipc.on('position', function(percent) {
+      document.getElementById('position').setAttribute('style', 'width: ' + percent + 'vw;');
+    });
+    ipc.on('playing', function(playing) {
+      document.getElementById('play-btn').className = 'fa fa-' + (playing ? 'pause' : 'play');
+    });
+    ipc.on('shuffle', function(shuffle) {
+      document.getElementById('shuffle-btn').setAttribute('style', 'color: #' + (shuffle ? '23CF5F' : '6f6f6f') + ';');
+      shuffling = shuffle;
+    });
+    ipc.on('length', function(data) {
+      length = data;
+    });
+    function shuffle() {
+      ipc.send('shuffle', !shuffling);
+    }
+    function play() {
+      ipc.send('playpause', null);
+    }
+    function prev() {
+      ipc.send('skip', false);
+    }
+    function next() {
+      ipc.send('skip', true);
+    }
+    function seek(event) {
+      var x = event.offsetX ? (event.offsetX) : event.pageX - document.getElementById('position').offsetLeft;
+      var percent = (x / 400) * 100;
+      document.getElementById('position').setAttribute('style', 'width: ' + percent + 'vw;');
+      ipc.send('seek', percent);
+    }
+    function getPos(event) {
+      x = event.clientX;
+      y = event.clientY;
+      document.getElementById('seek-pos').innerHTML = secToStamp((x / 400) * length);
+      y -= 94;
+      x -= 24;
+      //cursor="Your Mouse Position Is : " + x + " and " + y ;
+      //document.getElementById("seek").innerHTML=cursor
+      document.getElementById('seek-pos').setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px;');
+    }
+    function stopTracking() {
+      //document.getElementById("seek").innerHTML="";
+      document.getElementById('seek-pos').setAttribute('style', 'top: 100vh; left: 100vw;');
+    }
+    function secToStamp(sec) {
+      return Math.floor(sec / 60) + ':' + (sec % 60 < 10 ? '0' : '') + Math.floor(sec % 60);
+    }
+  </script>
+</html>

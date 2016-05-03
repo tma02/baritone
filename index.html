@@ -11,9 +11,24 @@
       }
       body {
         font-family: 'Montserrat', sans-serif;
-        background: #373737;
+        background: #272727;
         padding: 0;
         margin: 0;
+        height: 600px;
+        overflow: hidden;
+        -webkit-user-select: none;
+      }
+      #loading {
+        position: absolute;
+        z-index: 1000;
+        background: #272727;
+        color: #fff;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        text-align: center;
+        padding-top: 200px;
       }
       #control-bar {
         padding-top: 16px;
@@ -91,13 +106,17 @@
     <img id="cover">
     <div id="position"></div>
     <div id="seek" onclick="seek(event)" onmousemove="getPos(event)" onmouseout="stopTracking()">
-      <div id="seek-pos">1:00</div>
+      <div id="seek-pos">0:00</div>
     </div>
+    <div id="loading">Loading...</div>
   </body>
   <script>
     var ipc = require('ipc');
     var shuffling = false;
     var length = 0;
+    document.getElementById('cover').onload = function() {
+      document.getElementById('loading').remove();
+    };
     ipc.on('coverUrl', function(url) {
       document.getElementById('cover').src = url;
     });
@@ -138,12 +157,9 @@
       document.getElementById('seek-pos').innerHTML = secToStamp((x / 400) * length);
       y -= 94;
       x -= 24;
-      //cursor="Your Mouse Position Is : " + x + " and " + y ;
-      //document.getElementById("seek").innerHTML=cursor
       document.getElementById('seek-pos').setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px;');
     }
     function stopTracking() {
-      //document.getElementById("seek").innerHTML="";
       document.getElementById('seek-pos').setAttribute('style', 'top: 100vh; left: 100vw;');
     }
     function secToStamp(sec) {

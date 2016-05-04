@@ -58,6 +58,12 @@
         margin-top: 3px;
         font-size: 24px !important;
       }
+      #repeat-btn {
+        position: absolute;
+        right: 60px;
+        margin-top: 8px;
+        font-size: 16px !important;
+      }
       #cover {
         position: absolute;
         top: 64px;
@@ -102,6 +108,7 @@
       <i id="prev-btn" class="fa fa-step-backward" aria-hidden="true" onclick="prev()"></i>
       <i id="play-btn" class="fa fa-play" aria-hidden="true" onclick="play()"></i>
       <i id="next-btn" class="fa fa-step-forward" aria-hidden="true" onclick="next()"></i>
+      <i id="repeat-btn" class="fa fa-retweet" aria-hidden="true" onclick="repeat()"></i>
     </div>
     <img id="cover">
     <div id="position"></div>
@@ -113,6 +120,7 @@
   <script>
     var ipc = require('ipc');
     var shuffling = false;
+    var repeating = false;
     var length = 0;
     document.getElementById('cover').onload = function() {
       document.getElementById('loading').remove();
@@ -130,11 +138,18 @@
       document.getElementById('shuffle-btn').setAttribute('style', 'color: #' + (shuffle ? '23CF5F' : '6f6f6f') + ';');
       shuffling = shuffle;
     });
+    ipc.on('repeat', function(repeat) {
+      document.getElementById('repeat-btn').setAttribute('style', 'color: #' + (repeat ? '23CF5F' : '6f6f6f') + ';');
+      repeating = repeat;
+    });
     ipc.on('length', function(data) {
       length = data;
     });
     function shuffle() {
       ipc.send('shuffle', !shuffling);
+    }
+    function repeat() {
+      ipc.send('repeat', !repeating);
     }
     function play() {
       ipc.send('playpause', null);

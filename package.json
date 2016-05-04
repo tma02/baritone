@@ -5,7 +5,6 @@
   "main": "index.js",
   "dependencies": {
     "font-awesome": "^4.6.1",
-    "kbm-robot": "0.0.4",
     "menubar": "^4.1.0"
   },
   "devDependencies": {

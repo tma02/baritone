@@ -101,21 +101,11 @@ module.exports.getCurrentAlbumId = function() {
 };
 
 module.exports.seek = function(percent) {
-  /*var time = (percent / 100) * track.length;
-  time = Math.floor(time / 60) + ':' + (time % 60 < 10 ? '0' : '') + Math.floor(time % 60);
-  config = copyConfig();
-  config.host = mod.generateLocalHostname();
-  config.path = '/remote/play.json?oauth=' + oauth + '&csrf=' + csrf + '&uri=' + track.track_resource.uri + '#' + time;
-  mod.getJson(config, function(data) { console.log(data); });*/
   var time = (percent / 100) * track.length;
   exec('osascript -e \'tell application "Spotify" to set player position to ' + time + '\'');
 };
 
 module.exports.pause = function(pause) {
-  /*config = copyConfig();
-  config.host = mod.generateLocalHostname();
-  config.path = '/remote/pause.json?oauth=' + oauth + '&csrf=' + csrf + '&pause=' + pause;
-  mod.getJson(config, function(data) { console.log(data); });*/
   exec('osascript -e \'tell application "Spotify" to ' + pause ? 'pause' : 'play' + '\'');
 };
 
@@ -127,7 +117,7 @@ module.exports.skip = function(forward) {
   exec('osascript -e \'tell application "Spotify" to ' + (forward ? 'next' : 'previous') + ' track\'');
 };
 
-module.exports.repeating = function(repeating) {
+module.exports.repeat = function(repeating) {
   exec('osascript -e \'tell application "Spotify" to set repeating to ' + repeating + '\'');
 };
 

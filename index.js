@@ -1,6 +1,9 @@
 const menubar = require('menubar');
 const electron = require('electron');
+const AutoLaunch = require('auto-launch');
+
 const Menu = electron.Menu;
+const BrowserWindow = electron.BrowserWindow;
 const mb = menubar();
 
 mb.setOption('preload-window', true);
@@ -10,12 +13,43 @@ const spotify = require('./spotify.js');
 
 const ipcMain = require('electron').ipcMain;
 
+let settingsWindow;
+
+var appLauncher = new AutoLaunch({
+  name: 'spotifymenubar'
+});
+
 const contextMenu = Menu.buildFromTemplate([
   { label: 'spotify-menubar', enabled: false },
-  //{ label: 'Settings', click: function() { /*TODO*/ } },
+  //{ label: 'Settings', click: function() { openSettings(); } },
+  { label: 'Launch on Login', type: 'checkbox', checked: false, click: function(item) {
+    appLauncher.isEnabled().then(function(enabled) {
+      if (enabled) {
+        return appLauncher.disable().then(function() {
+          item.checked = false;
+        });
+      }
+      else {
+        return appLauncher.enable().then(function() {
+          item.checked = true;
+        });
+      }
+    });
+  } },
   { type: 'separator' },
   { label: 'Quit', click: function() { mb.app.quit(); } }
 ]);
+
+appLauncher.isEnabled().then(function(enabled) {
+  contextMenu.items[1].checked = enabled;
+});
+
+function openSettings() {
+  settingsWindow = new BrowserWindow({width: 400, height: 500});
+  settingsWindow.on('closed', function () {
+    settingsWindow = null;
+  });
+}
 
 mb.on('ready', function ready() {
   console.log('app is ready');

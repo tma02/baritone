@@ -71,6 +71,9 @@ module.exports.getCurrentAlbumId = function() {
   config.path = '/remote/status.json?oauth=' + oauth + '&csrf=' + csrf + '&returnafter=1&returnon=' + DEFAULT_RETURN_ON.join();
   mod.getJson(config, function(data) {
     //console.log(data);
+    if (typeof mainWindow !== 'undefined') {
+      mainWindow.webContents.send('running', data.running);
+    }
     try {
       if (data.track.album_resource.uri.split(':')[2] !== albumId) {
         console.log('ALBUM UPDATED');
@@ -169,7 +172,7 @@ module.exports.grabTokens = function() {
 
 module.exports.setWindow = function(window) {
   mainWindow = window;
-  console.log(mainWindow);
+  //console.log(mainWindow);
 };
 
 module.exports.init = function() {

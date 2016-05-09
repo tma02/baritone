@@ -20,7 +20,7 @@ var appLauncher = new AutoLaunch({
 });
 
 const contextMenu = Menu.buildFromTemplate([
-  { label: 'spotify-menubar', enabled: false },
+  { label: 'Baritone', enabled: false },
   //{ label: 'Settings', click: function() { openSettings(); } },
   { label: 'Launch on Login', type: 'checkbox', checked: false, click: function(item) {
     appLauncher.isEnabled().then(function(enabled) {
@@ -37,7 +37,7 @@ const contextMenu = Menu.buildFromTemplate([
     });
   } },
   { type: 'separator' },
-  { label: 'Quit', click: function() { mb.app.quit(); } }
+  { label: 'Quit Baritone', click: function() { mb.app.quit(); } }
 ]);
 
 appLauncher.isEnabled().then(function(enabled) {

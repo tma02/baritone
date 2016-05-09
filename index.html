@@ -28,7 +28,13 @@
         width: 100vw;
         height: 100vh;
         text-align: center;
-        padding-top: 200px;
+        padding-top: 180px;
+        font-size: 24px;
+      }
+      #longer {
+        padding: 16px;
+        font-size: 16px;
+        color: #6f6f6f;
       }
       #control-bar {
         background: #272727;
@@ -39,8 +45,8 @@
         color: #fff;
         width: 100vw;
         text-align: center;
-        box-shadow: 0 0 20px rgba(10, 10, 10, .85);
-        border-bottom: 1px solid #111;
+        box-shadow: 0 0 5px rgba(10, 10, 10, .65);
+        border-bottom: 1px solid #222;
         height: 48px;
       }
       #control-bar i {
@@ -122,15 +128,18 @@
     <div id="seek" onclick="seek(event)" onmousemove="getPos(event)" onmouseout="stopTracking()">
       <div id="seek-pos">0:00</div>
     </div>
-    <div id="loading">Loading...</div>
+    <div id="loading"><span id="loading-text">ONE MOMENT</span><div id="longer"></div></div>
   </body>
   <script>
     var ipc = require('ipc');
     var shuffling = false;
     var repeating = false;
     var length = 0;
+    setTimeout(function() {
+      document.getElementById('longer').innerHTML = 'Please make sure Spotify is running and that you have an internet connection.';
+    }, 10000);
     document.getElementById('cover').onload = function() {
-      document.getElementById('loading').remove();
+      document.getElementById('loading').style.visibility = 'hidden';
     };
     ipc.on('coverUrl', function(url) {
       document.getElementById('cover').src = url;
@@ -151,6 +160,12 @@
     });
     ipc.on('length', function(data) {
       length = data;
+    });
+    ipc.on('running', function(running) {
+      if (!running) {
+        document.getElementById('loading').style.visibility = 'visible';
+        document.getElementById('loading-text').innerHTML = 'NO CONNECTION';
+      }
     });
     function shuffle() {
       ipc.send('shuffle', !shuffling);

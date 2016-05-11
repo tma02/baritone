@@ -1,6 +1,10 @@
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 process.on('uncaughtException', function (error) {
   console.log(error);
+  if (error.code == 'ECONNRESET') {
+    spotifyPortOffset++;
+    console.log('connection failed; trying new port...');
+  }
 });
 
 const https = require('https');
@@ -9,6 +13,7 @@ const exec = require('child_process').exec;
 const SERVER_PORT = 5000;
 const UPDATE_INTERVAL = 1000;
 const DEFAULT_RETURN_ON = ['login', 'logout', 'play', 'pause', 'error', 'ap'];
+let spotifyPortOffset = 0;
 const DEFAULT_HTTPS_CONFIG = {
   host: '',
   port: 4370,
@@ -29,7 +34,9 @@ let mod;
 let trackUri;
 
 function copyConfig() {
-  return JSON.parse(JSON.stringify(DEFAULT_HTTPS_CONFIG));
+  let configCopy = JSON.parse(JSON.stringify(DEFAULT_HTTPS_CONFIG));
+  configCopy.port += (spotifyPortOffset % 10);
+  return configCopy;
 }
 
 module.exports = {};
@@ -76,7 +83,7 @@ module.exports.getCurrentAlbumId = function() {
     }
     try {
       if (data.track.album_resource.uri.split(':')[2] !== albumId) {
-        console.log('ALBUM UPDATED');
+        console.log('album updated');
         albumId = data.track.album_resource.uri.split(':')[2];
         track = data.track;
         console.log(albumId);
@@ -95,6 +102,9 @@ module.exports.getCurrentAlbumId = function() {
         mainWindow.webContents.send('repeat', data.repeat);
         mainWindow.webContents.send('next_enabled', data.next_enabled);
         mainWindow.webContents.send('prev_enabled', data.prev_enabled);
+        mainWindow.webContents.send('track', data.track.track_resource.name);
+        mainWindow.webContents.send('album', data.track.album_resource.name);
+        mainWindow.webContents.send('artist', data.track.artist_resource.name);
       }
     }
     catch(ex) {

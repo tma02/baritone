@@ -14,14 +14,22 @@ const spotify = require('./spotify.js');
 const ipcMain = require('electron').ipcMain;
 
 let settingsWindow;
+let aboutWindow;
 
-var appLauncher = new AutoLaunch({
+let appLauncher = new AutoLaunch({
   name: 'spotifymenubar'
 });
 
+let settings = {
+  showTrackTitle: true,
+  smallAlbumArt: false
+};
+
 const contextMenu = Menu.buildFromTemplate([
-  { label: 'Baritone', enabled: false },
-  //{ label: 'Settings', click: function() { openSettings(); } },
+  { label: 'About Baritone', click: function() { openAbout(); } },
+  /*{ label: 'Preferences', click: function() { openSettings(); } },*/
+  { type: 'separator' },
+  { label: 'Preferences', enabled: false },
   { label: 'Launch on Login', type: 'checkbox', checked: false, click: function(item) {
     appLauncher.isEnabled().then(function(enabled) {
       if (enabled) {
@@ -36,18 +44,40 @@ const contextMenu = Menu.buildFromTemplate([
       }
     });
   } },
+  { label: 'Show Track Title', type: 'checkbox', checked: false, click: function(item) {
+    settings.showTrackTitle = !settings.showTrackTitle;
+    item.checked = settings.showTrackTitle;
+    mb.window.webContents.send('showTrackTitle', settings.showTrackTitle);
+  }, enabled: false },
+  { label: 'Smaller Album Art', type: 'checkbox', checked: false, click: function(item) {
+    settings.smallAlbumArt = !settings.smallAlbumArt;
+    item.checked = settings.smallAlbumArt;
+    mb.window.webContents.send('smallAlbumArt', settings.smallAlbumArt);
+  }, enabled: false },
   { type: 'separator' },
   { label: 'Quit Baritone', click: function() { mb.app.quit(); } }
 ]);
 
 appLauncher.isEnabled().then(function(enabled) {
-  contextMenu.items[1].checked = enabled;
+  contextMenu.items[3].checked = enabled;
 });
+
+contextMenu.items[4].checked = settings.showTrackTitle;
+contextMenu.items[5].checked = settings.smallAlbumArt;
 
 function openSettings() {
   settingsWindow = new BrowserWindow({width: 400, height: 500});
+  settingsWindow.loadURL('file://' + __dirname + '/settings.html');
   settingsWindow.on('closed', function () {
     settingsWindow = null;
+  });
+}
+
+function openAbout() {
+  aboutWindow = new BrowserWindow({width: 400, height: 300});
+  aboutWindow.loadURL('file://' + __dirname + '/about.html');
+  aboutWindow.on('closed', function () {
+    aboutWindow = null;
   });
 }
 
@@ -61,6 +91,8 @@ mb.on('ready', function ready() {
 
 mb.on('after-create-window', function() {
   spotify.setWindow(mb.window);
+  mb.window.webContents.send('showTrackTitle', settings.showTrackTitle);
+  mb.window.webContents.send('smallAlbumArt', settings.smallAlbumArt);
 });
 
 ipcMain.on('seek', function(event, percent) {

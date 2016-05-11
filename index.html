@@ -1,7 +1,7 @@
 <html>
   <head>
     <link rel="stylesheet" href="node_modules/font-awesome/css/font-awesome.min.css">
-    <style>
+    <style type="text/css">
       @font-face {
         font-family: 'Montserrat';
         font-style: normal;
@@ -9,12 +9,16 @@
         src: local('Montserrat-Regular'), url(Montserrat.woff2) format('woff2');
         unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
       }
+      @-webkit-keyframes trackInfoIn {
+        from { bottom: -64px; }
+        to { bottom: 0; }
+      }
       body {
         font-family: 'Montserrat', sans-serif;
         background: #272727;
         padding: 0;
         margin: 0;
-        height: 464px;
+        height: 100vh;
         overflow: hidden;
         -webkit-user-select: none;
       }
@@ -84,6 +88,7 @@
         height: 100vw;
       }
       #position {
+        z-index: 99;
         background-color: #23CF5F;
         position: absolute;
         bottom: 0;
@@ -93,7 +98,30 @@
         box-shadow: 0 0 20px rgba(35, 207, 95, .85);
         border-radius: 2px;
       }
+      #track-info {
+        z-index: 50;
+        position: absolute;
+        text-align: center;
+        width: 100vw;
+        bottom: -64px;
+        color: #fff;
+        font-size: 14px;
+        height: 54px;
+        padding-top: 10px;
+        /*background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(39, 39, 39, 1));*/
+        background-color: rgba(39, 39, 39, 0.6);
+      }
+      #track-title {
+        font-size: 16px;
+      }
+      .track-info-in {
+        -webkit-animation: 0.3s ease-out 0s 1 normal both running trackInfoIn;
+      }
+      .track-info-out {
+        -webkit-animation: 0.3s ease-out 0s 1 reverse both running trackInfoIn;
+      }
       #seek {
+        z-index: 90;
         position: absolute;
         top: 64px;
         left: 0;
@@ -101,6 +129,7 @@
         height: 100vw;
       }
       #seek-pos {
+        z-index: 91;
         background-color: #373737;
         color: #fff;
         position: absolute;
@@ -125,7 +154,8 @@
     </div>
     <img id="cover">
     <div id="position"></div>
-    <div id="seek" onclick="seek(event)" onmousemove="getPos(event)" onmouseout="stopTracking()">
+    <div id="track-info"><span id="track-title"></span><br><span id="track-artist"></span> - <span id="track-album"></span></div>
+    <div id="seek" onclick="seek(event)" onmouseenter="displayTrackInfo()" onmousemove="getPos(event)" onmouseleave="stopTracking()">
       <div id="seek-pos">0:00</div>
     </div>
     <div id="loading"><span id="loading-text">ONE MOMENT</span><div id="longer"></div></div>
@@ -167,6 +197,15 @@
         document.getElementById('loading-text').innerHTML = 'NO CONNECTION';
       }
     });
+    ipc.on('track', function(track) {
+      document.getElementById('track-title').innerHTML = track;
+    });
+    ipc.on('artist', function(artist) {
+      document.getElementById('track-artist').innerHTML = artist;
+    });
+    ipc.on('album', function(album) {
+      document.getElementById('track-album').innerHTML = album;
+    });
     function shuffle() {
       ipc.send('shuffle', !shuffling);
     }
@@ -196,8 +235,16 @@
       x -= 24;
       document.getElementById('seek-pos').setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px;');
     }
+    function displayTrackInfo() {
+      document.getElementById('track-info').className = '';
+      document.getElementById('track-info').offsetWidth = document.getElementById('track-info').offsetWidth;
+      document.getElementById('track-info').className = 'track-info-in';
+    }
     function stopTracking() {
       document.getElementById('seek-pos').setAttribute('style', 'top: 100vh; left: 100vw;');
+      document.getElementById('track-info').className = '';
+      document.getElementById('track-info').offsetWidth = document.getElementById('track-info').offsetWidth;
+      document.getElementById('track-info').className = 'track-info-out';
     }
     function secToStamp(sec) {
       return Math.floor(sec / 60) + ':' + (sec % 60 < 10 ? '0' : '') + Math.floor(sec % 60);

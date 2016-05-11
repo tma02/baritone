@@ -1,0 +1,58 @@
+<html>
+<head>
+  <title>About Baritone</title>
+  <style type="text/css">
+    @font-face {
+      font-family: 'Montserrat';
+      font-style: normal;
+      font-weight: 200;
+      src: local('Montserrat-Regular'), url(Montserrat.woff2) format('woff2');
+      unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
+    }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #272727;
+      padding: 32px;
+      margin: 0;
+      overflow: hidden;
+      -webkit-user-select: none;
+      color: #fff;
+      text-align: center;
+    }
+    a {
+      color: #6f6f6f !important;
+    }
+    #baritone {
+      font-size: 24px;
+    }
+    #author {
+      color: #6f6f6f;
+    }
+    #attribution {
+      margin-top: 32px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="baritone">
+    <span>Baritone<span id="version"></span></span>
+  </div>
+  <div id="author">by Tianyi Ma</div><br>
+  <a href="https://github.com/tma02/baritone/" target="_blank">View Baritone on GitHub</a>
+  <div id="attribution">
+    Baritone is made possible by the following open source projects:<br>
+    <a href="#" onclick="openExternal('http://electron.atom.io/');">Electron<span id="electron-version"></span></a><br>
+    <a href="#" onclick="openExternal('https://github.com/Teamwork/node-auto-launch');">node-auto-launch</a><br>
+    <a href="#" onclick="openExternal('http://fontawesome.io/');">Font-Awesome</a><br><br>
+  </div>
+</body>
+<script type="text/javascript">
+  var shell = require('electron').shell;
+  function openExternal(url) {
+    shell.openExternal(url);
+  }
+  document.getElementById('version').innerHTML = ' ' + require('./package.json').version;
+  document.getElementById('electron-version').innerHTML = ' v' + process.versions.electron;
+</script>
+</html>

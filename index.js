@@ -44,15 +44,15 @@ const contextMenu = Menu.buildFromTemplate([
       }
     });
   } },
-  { label: 'Show Track Title', type: 'checkbox', checked: false, click: function(item) {
+  { label: 'Show Track Info', type: 'checkbox', checked: false, click: function(item) {
     settings.showTrackTitle = !settings.showTrackTitle;
     item.checked = settings.showTrackTitle;
-    mb.window.webContents.send('showTrackTitle', settings.showTrackTitle);
-  }, enabled: false },
+    mb.window.webContents.send('settings', settings);
+  }, enabled: true },
   { label: 'Smaller Album Art', type: 'checkbox', checked: false, click: function(item) {
     settings.smallAlbumArt = !settings.smallAlbumArt;
     item.checked = settings.smallAlbumArt;
-    mb.window.webContents.send('smallAlbumArt', settings.smallAlbumArt);
+    mb.window.webContents.send('settings', settings);
   }, enabled: false },
   { type: 'separator' },
   { label: 'Quit Baritone', click: function() { mb.app.quit(); } }
@@ -91,8 +91,7 @@ mb.on('ready', function ready() {
 
 mb.on('after-create-window', function() {
   spotify.setWindow(mb.window);
-  mb.window.webContents.send('showTrackTitle', settings.showTrackTitle);
-  mb.window.webContents.send('smallAlbumArt', settings.smallAlbumArt);
+  mb.window.webContents.send('settings', settings);
 });
 
 ipcMain.on('seek', function(event, percent) {

@@ -1,12 +1,12 @@
 {
   "name": "Baritone",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A Spotify controller that lives in the menubar.",
   "main": "index.js",
   "dependencies": {
     "auto-launch": "^2.0.1",
     "font-awesome": "^4.6.1",
-    "menubar": "^4.1.0"
+    "menubar": "latest"
   },
   "devDependencies": {
     "electron-prebuilt": "^0.37.8"

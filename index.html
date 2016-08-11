@@ -10,8 +10,20 @@
         unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215, U+E0FF, U+EFFD, U+F000;
       }
       @-webkit-keyframes trackInfoIn {
-        from { bottom: -64px; }
-        to { bottom: 0; }
+        from {
+          bottom: -64px;
+        }
+        to {
+          bottom: 0;
+        }
+      }
+      @-webkit-keyframes trackInfoBackgroundIn {
+        from {
+          background-position: 0px -405px;
+        }
+        to {
+          background-position: 0px -341px;
+        }
       }
       body {
         font-family: 'Montserrat', sans-serif;
@@ -107,10 +119,20 @@
         color: #fff;
         font-size: 14px;
         height: 54px;
-        padding-top: 10px;
         /*background: linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(39, 39, 39, 1));*/
-        background-color: rgba(39, 39, 39, 0.6);
+        /*background-color: rgba(39, 39, 39, 0.6);*/
+        overflow: hidden;
+      }
+      #track-info-background {
+        margin-top: -5px;
+        width: 100vw;
+        background-size: cover;
+        height: 64px;
         border-radius: 2px;
+        content: '';
+        -webkit-filter: blur(5px) saturate(2) brightness(0.5);
+        margin-bottom: -54px;
+        transform: scale(1.03);
       }
       #track-title {
         font-size: 16px;
@@ -120,6 +142,12 @@
       }
       .track-info-out {
         -webkit-animation: 0.25s cubic-bezier(0,.84,.31,1) 0s 1 reverse both running trackInfoIn;
+      }
+      .track-info-background-in {
+        -webkit-animation: 0.25s cubic-bezier(0,.84,.31,1) 0s 1 normal both running trackInfoBackgroundIn;
+      }
+      .track-info-background-out {
+        -webkit-animation: 0.25s cubic-bezier(0,.84,.31,1) 0s 1 reverse both running trackInfoBackgroundIn;
       }
       #seek {
         z-index: 90;
@@ -155,7 +183,7 @@
     </div>
     <img id="cover">
     <div id="position"></div>
-    <div id="track-info"><span id="track-title"></span><br><span id="track-artist"></span> - <span id="track-album"></span></div>
+    <div id="track-info"><div id="track-info-background"></div><div style="z-index: 51; position: relative;"><span id="track-title"></span><br><span id="track-artist"></span> - <span id="track-album"></span></div></div>
     <div id="seek" onclick="seek(event)" onmouseenter="displayTrackInfo()" onmousemove="getPos(event)" onmouseleave="stopTracking()">
       <div id="seek-pos">0:00</div>
     </div>
@@ -175,6 +203,7 @@
     };
     ipc.on('coverUrl', function(url) {
       document.getElementById('cover').src = url;
+      document.getElementById('track-info-background').style.backgroundImage = 'url(' + url + ')';
     });
     ipc.on('position', function(percent) {
       document.getElementById('position').setAttribute('style', 'width: ' + percent + 'vw;');
@@ -241,12 +270,18 @@
       document.getElementById('seek-pos').setAttribute('style', 'top: ' + y + 'px; left: ' + x + 'px;');
     }
     function displayTrackInfo() {
+      document.getElementById('track-info-background').className = '';
+      document.getElementById('track-info-background').offsetWidth = document.getElementById('track-info-background').offsetWidth;
+      document.getElementById('track-info-background').className = 'track-info-background-in';
       document.getElementById('track-info').className = '';
       document.getElementById('track-info').offsetWidth = document.getElementById('track-info').offsetWidth;
       document.getElementById('track-info').className = 'track-info-in';
     }
     function stopTracking() {
       document.getElementById('seek-pos').setAttribute('style', 'top: 100vh; left: 100vw;');
+      document.getElementById('track-info-background').className = '';
+      document.getElementById('track-info-background').offsetWidth = document.getElementById('track-info-background').offsetWidth;
+      document.getElementById('track-info-background').className = 'track-info-background-out';
       document.getElementById('track-info').className = '';
       document.getElementById('track-info').offsetWidth = document.getElementById('track-info').offsetWidth;
       document.getElementById('track-info').className = 'track-info-out';

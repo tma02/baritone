@@ -74,7 +74,7 @@ function openSettings() {
 }
 
 function openAbout() {
-  aboutWindow = new BrowserWindow({width: 400, height: 300});
+  aboutWindow = new BrowserWindow({width: 400, height: 320});
   aboutWindow.loadURL('file://' + __dirname + '/about.html');
   aboutWindow.on('closed', function () {
     aboutWindow = null;

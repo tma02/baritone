@@ -54,13 +54,14 @@ module.exports.getUrl = function(path) {
 };
 
 module.exports.getJson = function(config, callback) {
+  var port = config.port;
   https.get(config, function(res) {
     var body = '';
     res.on('data', function (d) {
       body += d;
     });
     res.on('end', function () {
-      callback(JSON.parse(body));
+      callback(JSON.parse(body), port);
     });
   });
 };
@@ -196,14 +197,17 @@ module.exports.init = function() {
       config = copyConfig();
       config.host = mod.generateLocalHostname();
       config.path = '/service/version.json?service=remote';
-      mod.getJson(config, function(data) {
+      mod.getJson(config, function(data, port) {
         if (!('running' in data)) {
           data.running = true;
         }
         version = data;
         console.log(version);
+        console.log('port: ' + port);
+        config.port = port;
       });
       console.log('waiting for spotify...');
+      config.port++;
     }
   }, 500);
 }

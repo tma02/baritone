@@ -86,9 +86,9 @@ module.exports.getCurrentAlbumId = function() {
       mainWindow.webContents.send('running', data.running);
     }
     try {
-      if (data.track.album_resource.uri.split(':')[2] !== albumId) {
+      if (data.track.album_resource.uri !== albumId) {
         console.log('album updated');
-        albumId = data.track.album_resource.uri.split(':')[2];
+        albumId = data.track.album_resource.uri;
         track = data.track;
         console.log(albumId);
         mod.getAlbumCover(albumId);
@@ -145,12 +145,12 @@ module.exports.shuffle = function(shuffle) {
 module.exports.getAlbumCover = function(id) {
   mod = this;
   config = copyConfig();
-  config.host = 'api.spotify.com';
-  config.path = '/v1/albums/' + id;
+  config.host = 'open.spotify.com';
+  config.path = '/oembed?url=' + id;
   config.port = 443;
   mod.getJson(config, function(data) {
-    console.log(data.images[0].url);
-    coverUrl = data.images[0].url;
+    console.log(data.thumbnail_url);
+    coverUrl = data.thumbnail_url;
     if (typeof mainWindow !== 'undefined') {
       mainWindow.webContents.send('coverUrl', coverUrl);
     }

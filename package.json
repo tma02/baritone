@@ -1,6 +1,6 @@
 {
   "name": "Baritone",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A Spotify controller that lives in the menubar.",
   "main": "index.js",
   "dependencies": {

@@ -29,7 +29,6 @@ const contextMenu = Menu.buildFromTemplate([
   { label: 'About Baritone', click: function() { openAbout(); } },
   /*{ label: 'Preferences', click: function() { openSettings(); } },*/
   { type: 'separator' },
-  { label: 'Preferences', enabled: false },
   { label: 'Launch on Login', type: 'checkbox', checked: false, click: function(item) {
     appLauncher.isEnabled().then(function(enabled) {
       if (enabled) {
@@ -49,21 +48,21 @@ const contextMenu = Menu.buildFromTemplate([
     item.checked = settings.showTrackTitle;
     mb.window.webContents.send('settings', settings);
   }, enabled: true },
-  { label: 'Smaller Album Art', type: 'checkbox', checked: false, click: function(item) {
+  /*{ label: 'Smaller Album Art', type: 'checkbox', checked: false, click: function(item) {
     settings.smallAlbumArt = !settings.smallAlbumArt;
     item.checked = settings.smallAlbumArt;
     mb.window.webContents.send('settings', settings);
-  }, enabled: false },
+  }, enabled: false },*/
   { type: 'separator' },
   { label: 'Quit Baritone', click: function() { mb.app.quit(); } }
 ]);
 
 appLauncher.isEnabled().then(function(enabled) {
-  contextMenu.items[3].checked = enabled;
+  contextMenu.items[2].checked = enabled;
 });
 
-contextMenu.items[4].checked = settings.showTrackTitle;
-contextMenu.items[5].checked = settings.smallAlbumArt;
+contextMenu.items[3].checked = settings.showTrackTitle;
+//contextMenu.items[4].checked = settings.smallAlbumArt;
 
 function openSettings() {
   settingsWindow = new BrowserWindow({width: 400, height: 500});

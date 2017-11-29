@@ -9,6 +9,7 @@ process.on('uncaughtException', function (error) {
 
 const https = require('https');
 const exec = require('child_process').exec;
+const request = require('request');
 
 const SERVER_PORT = 5000;
 const UPDATE_INTERVAL = 1000;
@@ -16,7 +17,7 @@ const DEFAULT_RETURN_ON = ['login', 'logout', 'play', 'pause', 'error', 'ap'];
 let spotifyPortOffset = 0;
 const DEFAULT_HTTPS_CONFIG = {
   host: '',
-  port: 4370,
+  port: 4380,
   path: '',
   headers: {
     'Origin': 'https://open.spotify.com',
@@ -52,20 +53,25 @@ module.exports.generateLocalHostname = function() {
   return '127.0.0.1';
 };
 
+module.exports.generateUrl = function(host, port, path) {
+  return `http${port == 443 ? 's' : ''}://${host}:${port}${path}`;
+}
+
 module.exports.getUrl = function(path) {
   mod.generateLocalHostname() + '/' + path;
 };
 
 module.exports.getJson = function(config, callback) {
-  var port = config.port;
-  https.get(config, function(res) {
-    var body = '';
-    res.on('data', function (d) {
-      body += d;
-    });
-    res.on('end', function () {
-      callback(JSON.parse(body), port);
-    });
+  var options = {
+    url: mod.generateUrl(config.host, config.port, config.path),
+    rejectUnauthorized: false,
+    headers: config.headers
+  }
+  request(options, function (error, response, body) {
+    //console.log('error:', error);
+    //console.log('statusCode:', response && response.statusCode);
+    //console.log('body:', body);
+    callback(JSON.parse(body));
   });
 };
 
@@ -161,6 +167,7 @@ module.exports.grabTokens = function() {
   if (typeof mainWindow !== 'undefined') {
     mainWindow.webContents.send('loadingText', 'Connecting to Spotify...');
   }
+  config = copyConfig();
   config.host = mod.generateLocalHostname();
   config.path = '/simplecsrf/token.json';
   mod.getJson(config, function(data) { csrf = data.token; });
